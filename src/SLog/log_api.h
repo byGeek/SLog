@@ -21,7 +21,7 @@ enum LogType {
 };
 
 //extern "C" SLOG_API ISLog getLogger(LogType t);
-SLOG_API ISLog getLogger(LogType t);
+SLOG_API ISLog getLogger(LogType t,...);
 
 
 #endif // !_D_LOG_API_H

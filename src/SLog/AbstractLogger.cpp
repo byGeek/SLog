@@ -11,9 +11,7 @@ AbstractLogger::AbstractLogger(){}
 AbstractLogger::~AbstractLogger(){}
 
 
-//todo: rewrite this, msg -> format?
 void AbstractLogger::debug(const char* format, ...) {
-	//todo: call internal log func
 	va_list list;
 	va_start(list, format);
 	log(Level::L_DEBUG, format, list);
@@ -36,6 +34,8 @@ void AbstractLogger::error(const char* format, ...) {
 
 void AbstractLogger::log(Level level, const char* format, va_list list) {
 	char logstr[MAX_LOG_SIZE];
+
+	//char* str = va_arg(list, char*);
 	/*
 	char timestr[128];
 	std::time_t t = std::time(nullptr);
@@ -60,8 +60,8 @@ void AbstractLogger::log(Level level, const char* format, va_list list) {
 		break;
 	}
 
-	auto cnt1 = sprintf_s(logstr, sizeof(logstr), "%s\t%s\t", util::getCurrentTime().c_str(), levelstr);
-	auto cnt2 = vsprintf_s(logstr + cnt1, sizeof(logstr) -1 - cnt1, format, list);
+	auto cnt1 = sprintf_s(logstr, MAX_LOG_SIZE, "%s\t%s\t", util::getCurrentTime("%Y/%m/%d %H:%M:%S").c_str(), levelstr);
+	auto cnt2 = vsprintf_s(logstr + cnt1, MAX_LOG_SIZE -1 - cnt1, format, list);
 	
 	if (cnt2 < 0) {
 		//todo: vsprintf_f error return
@@ -72,12 +72,5 @@ void AbstractLogger::log(Level level, const char* format, va_list list) {
 	logstr[cnt1 + cnt2 + 1] = '\0';
 
 	writeInternal(logstr, cnt1 + cnt2 + 1);
-	/*
-	if (stream.good) {
-		stream.write(logstr, cnt1 + cnt2 + 1);
-	}
-
-	*/
-
 
 }

@@ -2,12 +2,12 @@
 #include "SharedMemoryLogger.h"
 #include "util.h"
 
-#define LOG_FILE_SIZE (8*1024*1024)
+#define LOG_FILE_SIZE (1024*1024*8)
 
 //todo: implement on both unix and windows
 
 SharedMemoryLogger::SharedMemoryLogger(std::string filename) : m_filename(filename),
-	m_hFile(INVALID_HANDLE_VALUE), m_hMapping(NULL), m_pView(nullptr), m_bytesWritten(0)
+m_hFile(INVALID_HANDLE_VALUE), m_hMapping(NULL), m_pView(nullptr), m_bytesWritten(0)
 {
 	initNewLogFile();
 
@@ -25,7 +25,16 @@ SharedMemoryLogger::~SharedMemoryLogger() {
 void SharedMemoryLogger::writeInternal(const char* buf, int len) {
 	assert(buf != nullptr);
 
-	memcpy_s(getCurrentPointer(), bytesRemain(), buf, len);
+	if (len > LOG_FILE_SIZE) {
+		throw std::runtime_error("log file size too small");
+	}
+
+	if (m_bytesWritten > LOG_FILE_SIZE
+		|| m_bytesWritten + len > LOG_FILE_SIZE) {
+		initNewLogFile();  //init new log file
+	}
+
+	memcpy_s(getCurrentPointer(), bytesRemain(),buf, len);
 	m_bytesWritten += len;
 }
 
@@ -48,7 +57,7 @@ bool SharedMemoryLogger::initNewLogFile() {
 	}
 
 	//set file size to log file size
-	DWORD r = SetFilePointer(m_hFile, LOW_LONG(LOG_FILE_SIZE), HIGH_LONG(LOG_FILE_SIZE), FILE_BEGIN);
+	DWORD r = SetFilePointer(m_hFile, LOG_FILE_SIZE, NULL, FILE_BEGIN);
 	if (r == INVALID_SET_FILE_POINTER) {
 		return false;
 	}
@@ -106,5 +115,44 @@ size_t SharedMemoryLogger::bytesRemain() const {
 
 std::string SharedMemoryLogger::getNewFilename() const {
 	//todo: find files and append _1, _2 subfix
-	return m_filename;
+	/*
+#if WIN32
+	WIN32_FIND_DATAA ffd;
+	HANDLE hfind = INVALID_HANDLE_VALUE;
+
+	std::string pattern = m_filename;
+	std::size_t pos = m_filename.find_last_of(".");
+	if (pos == std::string::npos) {
+		pattern = m_filename.substr(0, pos);
+		pattern += "*" + m_filename.substr(pos);
+	}
+
+	//hfind = FindFirstFileA(m_filename.c_str(), &ffd);
+	hfind = FindFirstFileA(pattern.c_str(), &ffd);
+
+	if (hfind == INVALID_HANDLE_VALUE) {
+		char msg[1024];
+		sprintf_s(msg, 1024, "FindFirstFile failed with %d\n", GetLastError());
+		throw std::runtime_error(msg);
+	}
+
+	do {
+		if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+			//is directory, do nothing
+		}
+		else {
+			//todo:
+			//ffd.cFileName
+		}
+	}
+#endif
+*/
+	std::size_t pos = m_filename.find_last_of('.');
+	std::string filename(m_filename);
+	if (pos != std::string::npos) {
+		filename = m_filename.substr(0, pos) + "_" + util::getCurrentTime("%Y_%m_%d_%H_%M_%S") +
+			m_filename.substr(pos);
+	}
+
+	return filename;
 }

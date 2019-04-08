@@ -14,13 +14,13 @@ public:
 	~util() = default;
 
 
-	static std::string getCurrentTime() {
+	static std::string getCurrentTime(const char* format) {
 		char timestr[128];
 		std::time_t t = std::time(nullptr);
 		//std::strftime(timestr, sizeof(timestr), "%Y/%m/%d %H:%M:%S", std::localtime(&t));
 		tm ttm;
 		localtime_s(&ttm, &t);
-		std::strftime(timestr, sizeof(timestr), "%Y/%m/%d %H:%M:%S", &ttm);
+		std::strftime(timestr, sizeof(timestr), format, &ttm);  //"%Y/%m/%d %H:%M:%S"
 		return std::string(timestr);
 	}
 
