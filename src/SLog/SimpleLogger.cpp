@@ -22,7 +22,7 @@ SimpleLogger::~SimpleLogger() {
 }
 
 void SimpleLogger::writeInternal(const char* buf, int len) {
-	size_t ret = fwrite(buf, sizeof(char), len, m_file);
+	int ret = fwrite(buf, sizeof(char), len, m_file);
 	if (ret < len) {
 		//todo: fwrite failed?
 		assert(0);

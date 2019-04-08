@@ -115,14 +115,14 @@ size_t SharedMemoryLogger::bytesRemain() const {
 
 std::string SharedMemoryLogger::getNewFilename() const {
 	//todo: find files and append _1, _2 subfix
-	/*
+	
 #if WIN32
 	WIN32_FIND_DATAA ffd;
 	HANDLE hfind = INVALID_HANDLE_VALUE;
 
 	std::string pattern = m_filename;
 	std::size_t pos = m_filename.find_last_of(".");
-	if (pos == std::string::npos) {
+	if (pos != std::string::npos) {
 		pattern = m_filename.substr(0, pos);
 		pattern += "*" + m_filename.substr(pos);
 	}
@@ -131,28 +131,48 @@ std::string SharedMemoryLogger::getNewFilename() const {
 	hfind = FindFirstFileA(pattern.c_str(), &ffd);
 
 	if (hfind == INVALID_HANDLE_VALUE) {
+		/*
 		char msg[1024];
 		sprintf_s(msg, 1024, "FindFirstFile failed with %d\n", GetLastError());
 		throw std::runtime_error(msg);
+		*/
+		return m_filename;
 	}
 
+	auto max_index = 0;
 	do {
 		if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 			//is directory, do nothing
 		}
 		else {
-			//todo:
-			//ffd.cFileName
+			std::string fullpath(ffd.cFileName);
+			std::string friendly_filename = fullpath;
+			auto pos2 = friendly_filename.find_last_of("_");
+			if (pos2 != std::string::npos) {
+				auto len = friendly_filename.find_last_of('.') - pos2 - 1;
+				if (len > 0) {
+					auto index = atoi(friendly_filename.substr(pos2 + 1, len).c_str());
+					if (index > max_index) {
+						max_index = index;
+					}
+				}
+			}
 		}
-	}
+	} while (FindNextFileA(hfind, &ffd) != 0);
+
+	return m_filename.substr(0, m_filename.find_last_of('.')) + "_" + std::to_string(max_index + 1)
+		+ m_filename.substr(m_filename.find_last_of('.'));
+
 #endif
-*/
+
+	/*
 	std::size_t pos = m_filename.find_last_of('.');
 	std::string filename(m_filename);
 	if (pos != std::string::npos) {
 		filename = m_filename.substr(0, pos) + "_" + util::getCurrentTime("%Y_%m_%d_%H_%M_%S") +
 			m_filename.substr(pos);
 	}
+	*/
 
-	return filename;
+	//return filename;
 }

@@ -29,6 +29,42 @@ public:
 		GetSystemInfo(&info);
 		return info.dwAllocationGranularity;
 	}
+
+	static std::string getFileExtension(std::string filename) {
+
+		int pos1 = filename.find_last_of('.');
+		int pos2 = filename.find_last_of("/\\");
+		if (pos1 != std::string::npos){
+			if (((pos2 != std::string::npos) && (pos1 > pos2))
+				|| pos2 == std::string::npos) {
+				return filename.substr(pos1 + 1);
+
+			}
+		}
+
+		return std::string("");
+	}
+
+	static std::string getFileNameWithoutExt(std::string filename) {
+		int pos1 = filename.find_last_of("/\\");
+		int pos2 = filename.find_last_of('.');
+
+		int start = 0;
+		int len = 0;
+		if (pos1 != std::string::npos) {
+			start = pos1 + 1;
+		}
+		if (pos2 != std::string::npos) {
+			len = pos2 - pos1 - 1;
+		}
+
+		if (len > 0) {
+			return filename.substr(start, len);
+		}
+		else {
+			return filename.substr(start);
+		}
+	}
 };
 
 #endif // !_D_UTIL_H
