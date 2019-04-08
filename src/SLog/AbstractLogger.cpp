@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <ctime>
 #include <assert.h>
+#include "util.h"
 
 #define MAX_LOG_SIZE 2048
 
@@ -35,12 +36,14 @@ void AbstractLogger::error(const char* format, ...) {
 
 void AbstractLogger::log(Level level, const char* format, va_list list) {
 	char logstr[MAX_LOG_SIZE];
+	/*
 	char timestr[128];
 	std::time_t t = std::time(nullptr);
 	//std::strftime(timestr, sizeof(timestr), "%Y/%m/%d %H:%M:%S", std::localtime(&t));
 	tm ttm;
 	localtime_s(&ttm, &t);
 	std::strftime(timestr, sizeof(timestr), "%Y/%m/%d %H:%M:%S", &ttm);
+	*/
 
 	char levelstr[128];
 	switch (level) {
@@ -57,7 +60,7 @@ void AbstractLogger::log(Level level, const char* format, va_list list) {
 		break;
 	}
 
-	auto cnt1 = sprintf_s(logstr, sizeof(logstr), "%s\t%s\t", timestr, levelstr);
+	auto cnt1 = sprintf_s(logstr, sizeof(logstr), "%s\t%s\t", util::getCurrentTime().c_str(), levelstr);
 	auto cnt2 = vsprintf_s(logstr + cnt1, sizeof(logstr) -1 - cnt1, format, list);
 	
 	if (cnt2 < 0) {

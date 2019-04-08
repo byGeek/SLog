@@ -6,6 +6,7 @@
 #include "log_api.h"
 #include "SimpleLogger.h"
 #include "StdLogger.h"
+#include "SharedMemoryLogger.h"
 
 
 //todo: how to pass filename if logger type is simple file logger?
@@ -21,6 +22,7 @@ ISLog getLogger(LogType t) {
 		logger = std::make_unique<StdLogger>();
 		break;
 	case SHARE_MEM:
+		logger = std::make_unique<SharedMemoryLogger>("mmp_test.txt");
 		break;
 	default:
 		break;

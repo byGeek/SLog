@@ -11,8 +11,6 @@
 #include "Slog.h"
 #include <memory>
 
-//using std::unique_ptr<SLog> = ISLog;
-
 //typedef std::unique_ptr<SLog> ISLog;
 using ISLog = std::unique_ptr<SLog>;
 
