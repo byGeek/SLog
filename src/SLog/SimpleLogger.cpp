@@ -10,8 +10,9 @@ SimpleLogger::SimpleLogger(std::string filename, bool append) : m_filename(filen
 
 	auto ret = fopen_s(&m_file, filename.c_str(), mode);
 	if (ret != 0 || m_file == NULL) {
-		//todo: fopen failed
-		assert(0);
+		char msg[256];
+		sprintf_s(msg, 256, "fopen_s failed with: %d", GetLastError());
+		throw std::runtime_error(msg);
 	}
 }
 
@@ -24,7 +25,8 @@ SimpleLogger::~SimpleLogger() {
 void SimpleLogger::writeInternal(const char* buf, int len) {
 	int ret = fwrite(buf, sizeof(char), len, m_file);
 	if (ret < len) {
-		//todo: fwrite failed?
-		assert(0);
+		char msg[256];
+		sprintf_s(msg, 256, "fwrite failed with: %d", GetLastError());
+		throw std::runtime_error(msg);
 	}
 }

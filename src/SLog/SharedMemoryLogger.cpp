@@ -114,7 +114,6 @@ size_t SharedMemoryLogger::bytesRemain() const {
 }
 
 std::string SharedMemoryLogger::getNewFilename() const {
-	//todo: find files and append _1, _2 subfix
 	
 #if WIN32
 	WIN32_FIND_DATAA ffd;
@@ -163,16 +162,15 @@ std::string SharedMemoryLogger::getNewFilename() const {
 	return m_filename.substr(0, m_filename.find_last_of('.')) + "_" + std::to_string(max_index + 1)
 		+ m_filename.substr(m_filename.find_last_of('.'));
 
-#endif
-
-	/*
+#else
 	std::size_t pos = m_filename.find_last_of('.');
 	std::string filename(m_filename);
 	if (pos != std::string::npos) {
 		filename = m_filename.substr(0, pos) + "_" + util::getCurrentTime("%Y_%m_%d_%H_%M_%S") +
 			m_filename.substr(pos);
 	}
-	*/
 
-	//return filename;
+	return filename;
+
+#endif
 }

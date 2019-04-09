@@ -64,8 +64,9 @@ void AbstractLogger::log(Level level, const char* format, va_list list) {
 	auto cnt2 = vsprintf_s(logstr + cnt1, MAX_LOG_SIZE -1 - cnt1, format, list);
 	
 	if (cnt2 < 0) {
-		//todo: vsprintf_f error return
-		assert(0);
+		char msg[256];
+		sprintf_s(msg, 256, "vsprintf_s failed: %d", GetLastError());
+		throw std::runtime_error(msg);
 	}
 
 	logstr[cnt1 + cnt2] = '\n';
