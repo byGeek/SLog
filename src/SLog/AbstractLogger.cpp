@@ -11,57 +11,46 @@ AbstractLogger::AbstractLogger(){}
 AbstractLogger::~AbstractLogger(){}
 
 
-void AbstractLogger::debug(const char* format, ...) {
+void AbstractLogger::debug(const std::string format, ...) {
 	va_list list;
 	va_start(list, format);
-	log(Level::L_DEBUG, format, list);
+	log(Level::L_DEBUG, std::move(format), list);
 	va_end(list);
 }
 
-void AbstractLogger::info(const char* format, ...) {
+void AbstractLogger::info(const std::string format, ...) {
 	va_list list;
 	va_start(list, format);
-	log(Level::L_INFO, format, list);
+	log(Level::L_INFO, std::move(format), list);
 	va_end(list);
 }
 
-void AbstractLogger::error(const char* format, ...) {
+void AbstractLogger::error(const std::string format, ...) {
 	va_list list;
 	va_start(list, format);
-	log(Level::L_ERROR, format, list);
+	log(Level::L_ERROR, std::move(format), list);
 	va_end(list);
 }
 
-void AbstractLogger::log(Level level, const char* format, va_list list) {
+void AbstractLogger::log(Level level, const std::string format, va_list list){
 	char logstr[MAX_LOG_SIZE];
-
-	//char* str = va_arg(list, char*);
-	/*
-	char timestr[128];
-	std::time_t t = std::time(nullptr);
-	//std::strftime(timestr, sizeof(timestr), "%Y/%m/%d %H:%M:%S", std::localtime(&t));
-	tm ttm;
-	localtime_s(&ttm, &t);
-	std::strftime(timestr, sizeof(timestr), "%Y/%m/%d %H:%M:%S", &ttm);
-	*/
-
-	char levelstr[128];
+	std::string levelstr;
 	switch (level) {
 	case Level::L_DEBUG:
-		memcpy_s(levelstr, sizeof(levelstr), "DEBUG", sizeof("DEBUG"));
+		levelstr = "DEBUG";
 		break;
 	case Level::L_INFO:
-		memcpy_s(levelstr, sizeof(levelstr), "INFO", sizeof("INFO"));
+		levelstr = "INFO";
 		break;
 	case Level::L_ERROR:
-		memcpy_s(levelstr, sizeof(levelstr), "ERROR", sizeof("ERROR"));
+		levelstr = "ERROR";
 		break;
 	default:
 		break;
 	}
 
-	auto cnt1 = sprintf_s(logstr, MAX_LOG_SIZE, "%s\t%s\t", util::getCurrentTime("%Y/%m/%d %H:%M:%S").c_str(), levelstr);
-	auto cnt2 = vsprintf_s(logstr + cnt1, MAX_LOG_SIZE -1 - cnt1, format, list);
+	auto cnt1 = sprintf_s(logstr, MAX_LOG_SIZE, "%s\t%s\t", util::getCurrentTime("%Y/%m/%d %H:%M:%S").c_str(), levelstr.c_str());
+	auto cnt2 = vsprintf_s(logstr + cnt1, MAX_LOG_SIZE -1 - cnt1, format.c_str(), list);
 	
 	if (cnt2 < 0) {
 		char msg[256];

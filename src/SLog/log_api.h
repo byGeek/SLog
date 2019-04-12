@@ -14,7 +14,7 @@
 //typedef std::unique_ptr<SLog> ISLog;
 using ISLog = std::unique_ptr<SLog>;
 
-enum LogType {
+enum class LogType {
 	SIMPLE_FILE,
 	STD,
 	SHARE_MEM

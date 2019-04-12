@@ -27,14 +27,14 @@ ISLog getLogger(LogType t,...) {
 	ISLog logger;
 	switch (t)
 	{
-	case SIMPLE_FILE:
+	case LogType::SIMPLE_FILE:
 		pFileName = va_arg(list, char*);
 		logger = std::make_unique<SimpleLogger>(std::string(pFileName), true);
 		break;
-	case STD:
+	case LogType::STD:
 		logger = std::make_unique<StdLogger>();
 		break;
-	case SHARE_MEM:
+	case LogType::SHARE_MEM:
 		pFileName = va_arg(list, char*);
 		assert(pFileName != nullptr);
 		logger = std::make_unique<SharedMemoryLogger>(std::string(pFileName));

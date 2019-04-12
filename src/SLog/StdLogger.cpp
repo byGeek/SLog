@@ -6,7 +6,7 @@
 StdLogger::StdLogger(){ }
 StdLogger::~StdLogger(){ }
 
-void StdLogger::writeInternal(const char* buf, int len) {
+void StdLogger::writeInternal(const char* buf, int len){
 	std::string str(buf, len);
 	std::cout << str << std::flush;
 }
